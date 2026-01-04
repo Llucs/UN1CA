@@ -5,15 +5,14 @@ on:
   pull_request:
   push:
     branches:
-      - 'sixteen'
+      - sixteen
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# Permissões explícitas (importante em fork)
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -44,7 +43,7 @@ jobs:
       - name: Free disk space (3/3)
         uses: rokibhasansagar/slimhub_actions@main
         with:
-          retain: 'compiler_cmake'
+          retain: compiler_cmake
 
       - name: Set up build environment
         run: |
@@ -54,21 +53,27 @@ jobs:
             libbrotli-dev libgtest-dev libprotobuf-dev libunwind-dev libpcre2-dev \
             libzstd-dev linux-modules-extra-$(uname -r) lld protobuf-compiler webp
 
-          sudo modprobe erofs f2fs
+          sudo modprobe erofs f2fs || true
 
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Fork-safe: usar chaves AOSP existentes
-          cp security/aosp_platform.pk8 security/unica_platform.pk8
-          cp security/aosp_platform.x509.pem security/unica_platform.x509.pem
+          mkdir -p security
+
+          if [ -z "${{ secrets.PLATFORM_KEY_PK8 }}" ] || [ -z "${{ secrets.PLATFORM_KEY_PEM }}" ]; then
+            echo "Missing PLATFORM_KEY secrets"
+            exit 1
+          fi
+
+          echo "${{ secrets.PLATFORM_KEY_PK8 }}" | base64 --decode > security/unica_platform.pk8
+          echo "${{ secrets.PLATFORM_KEY_PEM }}" | base64 --decode > security/unica_platform.x509.pem
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'
+          distribution: temurin
+          java-version: 17
+          cache: gradle
 
       - name: Build dependencies
         run: |
