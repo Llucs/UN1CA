@@ -21,9 +21,3 @@
 
 # Enable high refresh rate (90Hz) support
 SEC_FLOATING_FEATURE_LCD_CONFIG_HFR_MODE=2
-
-# Enable extra brightness feature (Vision Booster support)
-SEC_FLOATING_FEATURE_LCD_SUPPORT_EXTRA_BRIGHTNESS=TRUE
-
-# Enable virtual proximity sensor if applicable (Common on A series)
-SEC_FLOATING_FEATURE_SENSOR_SUPPORT_VIRTUAL_PROXIMITY=TRUE
