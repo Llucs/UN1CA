@@ -1,3 +1,8 @@
+# Disable smali patches for a155m, a15 is not compatible with smali patches.
+if [ "$TARGET_CODENAME" == "a155m" ]; then
+    return 0
+fi
+
 SET_PROP_IF_DIFF "vendor" "ro.oem_unlock_supported" "0"
 
 # Better device/model detection in CoreRune
